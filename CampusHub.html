@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Hub</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .hidden {
+            display: none;
+        }
+        .error-message {
+            color: red;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .shake {
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Login/Register Page -->
+    <div id="loginPage" class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-8 rounded-lg shadow-md w-96">
+            <h2 class="text-2xl font-bold text-center mb-6">Campus Hub</h2>
+            
+            <!-- Login Form -->
+            <div id="loginForm">
+                <div class="mb-4">
+                    <input type="email" id="email" placeholder="Institute Email" class="w-full p-2 border rounded" required>
+                    <div id="emailError" class="error-message hidden">Please enter a valid email</div>
+                </div>
+                <div class="mb-4">
+                    <input type="password" id="password" placeholder="Password" class="w-full p-2 border rounded" required>
+                    <div id="passwordError" class="error-message hidden">Password is required</div>
+                </div>
+                <button id="loginBtn" class="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700">Login</button>
+                <div id="loginError" class="error-message mt-2 hidden">Invalid email or password</div>
+                <p class="text-center mt-4">Not registered? <a href="#" id="showRegister" class="text-indigo-600 hover:underline">Register</a></p>
+            </div>
+            
+            <!-- Registration Form -->
+            <div id="registerForm" class="hidden">
+                <div class="mb-4">
+                    <input type="text" id="name" placeholder="Name" class="w-full p-2 border rounded" required>
+                    <div id="nameError" class="error-message hidden">Name is required</div>
+                </div>
+                <div class="mb-4">
+                    <input type="text" id="institute" placeholder="Institute Name" class="w-full p-2 border rounded" required>
+                    <div id="instituteError" class="error-message hidden">Institute name is required</div>
+                </div>
+                <div class="mb-4">
+                    <input type="email" id="regEmail" placeholder="Institute Email" class="w-full p-2 border rounded" required>
+                    <div id="regEmailError" class="error-message hidden">Please enter a valid email</div>
+                </div>
+                <div class="mb-4">
+                    <input type="password" id="createPassword" placeholder="Create Password (min 6 chars)" class="w-full p-2 border rounded" minlength="6" required>
+                    <div id="createPasswordError" class="error-message hidden">Password must be at least 6 characters</div>
+                </div>
+                <div class="mb-4">
+                    <input type="password" id="confirmPassword" placeholder="Reconfirm Password" class="w-full p-2 border rounded" required>
+                    <div id="confirmPasswordError" class="error-message hidden">Passwords do not match</div>
+                </div>
+                <div class="mb-4">
+                    <input type="tel" id="mobile" placeholder="Mobile Number" class="w-full p-2 border rounded" required>
+                    <div id="mobileError" class="error-message hidden">Valid mobile number required</div>
+                </div>
+                <div class="mb-4">
+                    <select id="hostelBlock" class="w-full p-2 border rounded" required>
+                        <option value="">Select Hostel Block</option>
+                        <option value="A">Block A</option>
+                        <option value="B">Block B</option>
+                        <option value="C">Block C</option>
+                        <option value="D">Block D</option>
+                    </select>
+                    <div id="hostelBlockError" class="error-message hidden">Please select hostel block</div>
+                </div>
+                <div class="mb-4">
+                    <input type="text" id="roomNumber" placeholder="Room Number" class="w-full p-2 border rounded" required>
+                    <div id="roomNumberError" class="error-message hidden">Room number is required</div>
+                </div>
+                <button id="registerBtn" class="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700">Register</button>
+                <div id="registrationSuccess" class="text-green-600 mt-2 hidden">Registration successful! You can now login.</div>
+                <p class="text-center mt-4">Already registered? <a href="#" id="showLogin" class="text-indigo-600 hover:underline">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="hidden p-4">
+        <nav class="bg-white shadow-md p-4 rounded-lg mb-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl font-bold">Welcome to Campus Hub</h1>
+                <button id="logoutBtn" class="text-indigo-600 hover:text-indigo-800">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </nav>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Laundry Manager Card -->
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <div class="text-center">
+                    <i class="fas fa-tshirt text-4xl mb-3 text-indigo-600"></i>
+                    <h3 class="text-lg font-semibold mb-2">Laundry Manager</h3>
+                    <p class="text-gray-600 mb-4">Book slots and check machine status</p>
+                    <button id="laundryBtn" class="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700">Open</button>
+                </div>
+            </div>
+            
+            <!-- Mess Food Optimizer Card -->
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <div class="text-center">
+                    <i class="fas fa-utensils text-4xl mb-3 text-green-600"></i>
+                    <h3 class="text-lg font-semibold mb-2">Mess Food Optimizer</h3>
+                    <p class="text-gray-600 mb-4">View menu and submit preferences</p>
+                    <button id="messBtn" class="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700">Open</button>
+                </div>
+            </div>
+            
+            <!-- Lost & Found Card -->
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <div class="text-center">
+                    <i class="fas fa-search text-4xl mb-3 text-yellow-600"></i>
+                    <h3 class="text-lg font-semibold mb-2">Lost & Found</h3>
+                    <p class="text-gray-600 mb-4">Report lost or found items</p>
+                    <button id="lostFoundBtn" class="w-full bg-yellow-600 text-white p-2 rounded hover:bg-yellow-700">Open</button>
+                </div>
+            </div>
+            
+            <!-- Notices & Issues Card -->
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <div class="text-center">
+                    <i class="fas fa-bullhorn text-4xl mb-3 text-red-600"></i>
+                    <h3 class="text-lg font-semibold mb-2">Notices & Issues</h3>
+                    <p class="text-gray-600 mb-4">View notices and report issues</p>
+                    <button id="noticesBtn" class="w-full bg-red-600 text-white p-2 rounded hover:bg-red-700">Open</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // User data storage (in real app, this would be a database)
+        if (!localStorage.getItem('users')) {
+            localStorage.setItem('users', JSON.stringify([]));
+        }
+
+        // DOM Elements
+        const loginPage = document.getElementById('loginPage');
+        const dashboard = document.getElementById('dashboard');
+        
+        // Show registration form
+        document.getElementById('showRegister').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+            clearErrors();
+        });
+
+        // Show login form
+        document.getElementById('showLogin').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+            clearErrors();
+        });
+
+        // Handle login
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            let isValid = true;
+
+            // Validate email
+            if (!email || !validateEmail(email)) {
+                showError('emailError', 'Please enter a valid email');
+                isValid = false;
+            } else {
+                hideError('emailError');
+            }
+
+            // Validate password
+            if (!password) {
+                showError('passwordError', 'Password is required');
+                isValid = false;
+            } else {
+                hideError('passwordError');
+            }
+
+            if (!isValid) {
+                document.getElementById('loginForm').classList.add('shake');
+                setTimeout(() => {
+                    document.getElementById('loginForm').classList.remove('shake');
+                }, 500);
+                return;
+            }
+
+            // Check credentials
+            const users = JSON.parse(localStorage.getItem('users'));
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                // Successful login
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                loginPage.classList.add('hidden');
+                dashboard.classList.remove('hidden');
+                document.getElementById('loginError').classList.add('hidden');
+            } else {
+                // Failed login
+                showError('loginError', 'Invalid email or password');
+                document.getElementById('loginForm').classList.add('shake');
+                setTimeout(() => {
+                    document.getElementById('loginForm').classList.remove('shake');
+                }, 500);
+            }
+        });
+
+        // Handle registration
+        document.getElementById('registerBtn').addEventListener('click', function() {
+            const name = document.getElementById('name').value.trim();
+            const institute = document.getElementById('institute').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const createPassword = document.getElementById('createPassword').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value.trim();
+            const mobile = document.getElementById('mobile').value.trim();
+            const hostelBlock = document.getElementById('hostelBlock').value;
+            const roomNumber = document.getElementById('roomNumber').value.trim();
+            
+            let isValid = true;
+
+            // Validate name
+            if (!name) {
+                showError('nameError', 'Name is required');
+                isValid = false;
+            } else {
+                hideError('nameError');
+            }
+
+            // Validate institute
+            if (!institute) {
+                showError('instituteError', 'Institute name is required');
+                isValid = false;
+            } else {
+                hideError('instituteError');
+            }
+
+            // Validate email
+            if (!email || !validateEmail(email)) {
+                showError('regEmailError', 'Please enter a valid email');
+                isValid = false;
+            } else {
+                hideError('regEmailError');
+            }
+
+            // Validate password
+            if (!createPassword || createPassword.length < 6) {
+                showError('createPasswordError', 'Password must be at least 6 characters');
+                isValid = false;
+            } else {
+                hideError('createPasswordError');
+            }
+
+            // Validate confirm password
+            if (createPassword !== confirmPassword) {
+                showError('confirmPasswordError', 'Passwords do not match');
+                isValid = false;
+            } else {
+                hideError('confirmPasswordError');
+            }
+
+            // Validate mobile
+            if (!mobile || !/^\d{10}$/.test(mobile)) {
+                showError('mobileError', 'Enter a valid 10-digit mobile number');
+                isValid = false;
+            } else {
+                hideError('mobileError');
+            }
+
+            // Validate hostel block
+            if (!hostelBlock) {
+                showError('hostelBlockError', 'Please select hostel block');
+                isValid = false;
+            } else {
+                hideError('hostelBlockError');
+            }
+
+            // Validate room number
+            if (!roomNumber) {
+                showError('roomNumberError', 'Room number is required');
+                isValid = false;
+            } else {
+                hideError('roomNumberError');
+            }
+
+            if (!isValid) {
+                document.getElementById('registerForm').classList.add('shake');
+                setTimeout(() => {
+                    document.getElementById('registerForm').classList.remove('shake');
+                }, 500);
+                return;
+            }
+
+            // Check if email already exists
+            const users = JSON.parse(localStorage.getItem('users'));
+            if (users.some(u => u.email === email)) {
+                showError('regEmailError', 'Email already registered');
+                document.getElementById('registerForm').classList.add('shake');
+                setTimeout(() => {
+                    document.getElementById('registerForm').classList.remove('shake');
+                }, 500);
+                return;
+            }
+
+            // Create new user
+            const newUser = {
+                name,
+                institute,
+                email,
+                password: createPassword,
+                mobile,
+                hostelBlock,
+                roomNumber,
+                createdAt: new Date().toISOString()
+            };
+
+            // Save user
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // Show success message and switch to login
+            document.getElementById('registrationSuccess').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('registerForm').classList.add('hidden');
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('email').value = email;
+                document.getElementById('registrationSuccess').classList.add('hidden');
+                clearForm('registerForm');
+            }, 1500);
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem('currentUser');
+            dashboard.classList.add('hidden');
+            loginPage.classList.remove('hidden');
+            clearForm('loginForm');
+        });
+
+        // Dashboard functionality
+        // Laundry Manager Modal
+        const laundryModal = document.createElement('div');
+        laundryModal.id = 'laundryModal';
+        laundryModal.className = 'hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center';
+        laundryModal.innerHTML = `
+            <div class="bg-white p-6 rounded-lg shadow-md w-96">
+                <h2 class="text-xl font-bold mb-4">Laundry Manager</h2>
+                <div class="mb-4">
+                    <h3 class="font-semibold mb-2">Book a Slot:</h3>
+                    <select id="machineSelection" class="w-full p-2 border rounded mb-2">
+                        <option value="1">Machine 1</option>
+                        <option value="2">Machine 2</option>
+                    </select>
+                    <input type="datetime-local" id="laundryTime" class="w-full p-2 border rounded">
+                </div>
+                <div class="mb-4">
+                    <h3 class="font-semibold">Current Status:</h3>
+                    <div class="mt-2">
+                        <p>Machine 1: <span class="text-green-600">Available</span></p>
+                        <p>Machine 2: <span class="text-red-600">In Use (45 min remaining)</span></p>
+                    </div>
+                </div>
+                <button id="bookLaundryBtn" class="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700">Book Slot</button>
+                <button id="closeLaundryModal" class="w-full bg-gray-300 text-gray-800 p-2 rounded hover:bg-gray-400 mt-2">Close</button>
+            </div>
+        `;
+        document.body.appendChild(laundryModal);
+
+        document.getElementById('laundryBtn').addEventListener('click', function() {
+            document.getElementById('laundryModal').classList.remove('hidden');
+        });
+
+        document.getElementById('closeLaundryModal').addEventListener('click', function() {
+            document.getElementById('laundryModal').classList.add('hidden');
+        });
+
+        document.getElementById('bookLaundryBtn').addEventListener('click', function() {
+            const machine = document.getElementById('machineSelection').value;
+            const time = document.getElementById('laundryTime').value;
+            if (!time) {
+                alert("Please select a date and time");
+                return;
+            }
+            alert(Booking confirmed for Machine ${machine} at ${new Date(time).toLocaleString()});
+        });
+
+        // Mess Food Optimizer Modal
+        const messModal = document.createElement('div');
+        messModal.id = 'messModal';
+        messModal.className = 'hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center';
+        messModal.innerHTML = `
+            <div class="bg-white p-6 rounded-lg shadow-md w-96">
+                <h2 class="text-xl font-bold mb-4">Mess Food Optimizer</h2>
+                <h3 class="font-semibold">Today's Menu:</h3>
+                <ul class="list-disc pl-5 mb-4">
+                    <li>Chicken Curry</li>
+                    <li>Rice</li>
+                    <li>Salad</li>
+                </ul>
+                <div class="mb-4">
+                    <h3 class="font-semibold">Meal Preference:</h3>
+                    <select id="mealOption" class="w-full p-2 border rounded">
+                        <option value="full">Full</option>
+                        <option value="half">Half</option>
+                        <option value="skip">Skip</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <h3 class="font-semibold">Feedback:</h3>
+                    <textarea id="mealFeedback" class="w-full p-2 border rounded" placeholder="Your feedback..."></textarea>
+                </div>
+                <button id="submitMealBtn" class="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700">Submit</button>
+                <button id="closeMessModal" class="w-full bg-gray-300 text-gray-800 p-2 rounded hover:bg-gray-400 mt-2">Close</button>
+            </div>
+        `;
+        document.body.appendChild(messModal);
+
+        document.getElementById('messBtn').addEventListener('click', function() {
+            document.getElementById('messModal').classList.remove('hidden');
+        });
+
+        document.getElementById('closeMessModal').addEventListener('click', function() {
+            document.getElementById('messModal').classList.add('hidden');
+        });
+
+        document.getElementById('submitMealBtn').addEventListener('click', function() {
+            const option = document.getElementById('mealOption').value;
+            const feedback = document.getElementById('mealFeedback').value;
+            alert(Thank you! Your ${option} meal selection has been recorded);
+        });
+
+        // Lost & Found Modal
+        const lostFoundModal = document.createElement('div');
+        lostFoundModal.id = 'lostFoundModal';
+        lostFoundModal.className = 'hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center';
+        lostFoundModal.innerHTML = `
+            <div class="bg-white p-6 rounded-lg shadow-md w-96">
+                <h2 class="text-xl font-bold mb-4">Lost & Found</h2>
+                
+                <div class="mb-4">
+                    <h3 class="font-semibold mb-2">Lost Item</h3>
+                    <input type="text" id="lostItemDesc" placeholder="Description" class="w-full p-2 border rounded mb-2">
+                    <input type="text" id="lostLocation" placeholder="Location lost" class="w-full p-2 border rounded mb-2">
+                    <input type="file" id="lostImage" class="w-full" accept="image/*">
+                </div>
+
+                <div class="mb-4">
+                    <h3 class="font-semibold mb-2">Found Item</h3>
+                    <input type="text" id="foundItemDesc" placeholder="Description" class="w-full p-2 border rounded mb-2">
+                    <input type="text" id="foundLocation" placeholder="Location found" class="w-full p-2 border rounded mb-2">
+                    <input type="file" id="foundImage" class="w-full" accept="image/*">
+                </div>
+
+                <button id="submitLostFoundBtn" class="w-full bg-yellow-600 text-white p-2 rounded hover:bg-yellow-700">Submit</button>
+                <button id="closeLostFoundModal" class="w-full bg-gray-300 text-gray-800 p-2 rounded hover:bg-gray-400 mt-2">Close</button>
+            </div>
+        `;
+        document.body.appendChild(lostFoundModal);
+
+        document.getElementById('lostFoundBtn').addEventListener('click', function() {
+            document.getElementById('lostFoundModal').classList.remove('hidden');
+        });
+
+        document.getElementById('closeLostFoundModal').addEventListener('click', function() {
+            document.getElementById('lostFoundModal').classList.add('hidden');
+        });
+
+        document.getElementById('submitLostFoundBtn').addEventListener('click', function() {
+            const lostDesc = document.getElementById('lostItemDesc').value;
+            const foundDesc = document.getElementById('foundItemDesc').value;
+            
+            if (lostDesc || foundDesc) {
+                alert("Thank you for your report! We'll contact you if we find a match.");
+            } else {
+                alert("Please fill in at least one report");
+            }
+        });
+
+        // Notices & Issues Modal
+        const noticesModal = document.createElement('div');
+        noticesModal.id = 'noticesModal';
+        noticesModal.className = 'hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center';
+        noticesModal.innerHTML = `
+            <div class="bg-white p-6 rounded-lg shadow-md w-96">
+                <h2 class="text-xl font-bold mb-4">Notices & Issues</h2>
+                
+                <div class="mb-4">
+                    <h3 class="font-semibold mb-2">Upcoming Notices:</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li>Maintenance work - Block A (May 15-17)</li>
+                        <li>WiFi upgrade - May 20, 2-4am</li>
+                        <li>Mess will be closed May 21</li>
+                    </ul>
+                </div>
+
+                <div class="mb-4">
+                    <h3 class="font-semibold mb-2">Report Issue:</h3>
+                    <select id="issueType" class="w-full p-2 border rounded mb-2">
+                        <option value="cleaning">Cleaning Staff</option>
+                        <option value="technician">Technician</option>
+                    </select>
+                    <textarea id="issueDesc" class="w-full p-2 border rounded" placeholder="Describe the issue..."></textarea>
+                </div>
+
+                <button id="submitIssueBtn" class="w-full bg-red-600 text-white p-2 rounded hover:bg-red-700">Submit Issue</button>
+                <button id="closeNoticesModal" class="w-full bg-gray-300 text-gray-800 p-2 rounded hover:bg-gray-400 mt-2">Close</button>
+            </div>
+        `;
+        document.body.appendChild(noticesModal);
+
+        document.getElementById('noticesBtn').addEventListener('click', function() {
+            document.getElementById('noticesModal').classList.remove('hidden');
+        });
+
+        document.getElementById('closeNoticesModal').addEventListener('click', function() {
+            document.getElementById('noticesModal').classList.add('hidden');
+        });
+
+        document.getElementById('submitIssueBtn').addEventListener('click', function() {
+            const issueType = document.getElementById('issueType').value;
+            const description = document.getElementById('issueDesc').value;
+            
+            if (description) {
+                alert(Your ${issueType} request has been submitted. We'll address it soon!);
+            } else {
+                alert("Please describe the issue");
+            }
+        });
+
+        // Helper functions
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function showError(id, message) {
+            const element = document.getElementById(id);
+            element.textContent = message;
+            element.classList.remove('hidden');
+        }
+
+        function hideError(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.classList.add('hidden');
+            });
+        }
+
+        function clearForm(formId) {
+            const form = document.getElementById(formId);
+            const inputs = form.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                if (input.type !== 'button' && input.type !== 'submit') {
+                    input.value = '';
+                }
+            });
+            clearErrors();
+        }
+
+        // Check if user is already logged in
+        if (localStorage.getItem('currentUser')) {
+            loginPage.classList.add('hidden');
+            dashboard.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
