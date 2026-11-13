@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Hub</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .hidden { display: none; }
+        .error-message { color: red; font-size: 0.875rem; margin-top: 0.25rem; }
+        .ok-message { color: #059669; font-size: 0.875rem; margin-top: 0.5rem; }
+        .shake { animation: shake 0.5s; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .modal { z-index: 50; overflow-y: auto; padding: 1rem; }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Login/Register Page -->
+    <div id="loginPage" class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-8 rounded-lg shadow-md w-96">
+            <h2 class="text-2xl font-bold text-center mb-6">Campus Hub</h2>
+
+            <!-- Login Form -->
+            <div id="loginForm">
+                <div class="mb-4">
+                    <input type="email" id="email" placeholder="Institute Email" class="w-full p-2 border rounded" required>
+                    <div id="emailError" class="error-message hidden">Please enter a valid email</div>
+                </div>
+                <div class="mb-4">
+                    <input type="password" id="password" placeholder="Password" class="w-full p-2 border rounded" required>
+                    <div id="passwordError" class="error-message hidden">Password is required</div>
+                </div>
+                <button id="loginBtn" class="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700">Login</button>
+                <div id="loginError" class="error-message mt-2 hidden">Invalid email or password</div>
+                <p class="text-center mt-4">Not registered? <a href="#" id="showRegister" class="text-indigo-600 hover:underline">Register</a></p>
+            </div>
+
+            <!-- Registration Form -->
+            <div id="registerForm" class="hidden">
+                <div class="mb-4">
+                    <input type="text" id="name" placeholder="Name" class="w-full p-2 border rounded" required>
+                    <div id="nameError" class="error-message hidden">Name is required</div>
+                </div>
+                <div class="mb-4">
+                    <input type="text" id="institute" placeholder="Institute Name" class="w-full p-2 border rounded" required>
+                    <div id="instituteError" class="error-message hidden">Institute name is required</div>
+                </div>
+                <div class="mb-4">
+                    <input type="email" id="regEmail" placeholder="Institute Email" class="w-full p-2 border rounded" required>
+                    <div id="regEmailError" class="error-message hidden">Please enter a valid email</div>
+                </div>
+                <div class="mb-4">
+                    <input type="password" id="createPassword" placeholder="Create Password (min 6 chars)" class="w-full p-2 border rounded" minlength="6" required>
+                    <div id="createPasswordError" class="error-message hidden">Password must be at least 6 characters</div>
+                </div>
+                <div class="mb-4">
+                    <input type="password" id="confirmPassword" placeholder="Reconfirm Password" class="w-full p-2 border rounded" required>
+                    <div id="confirmPasswordError" class="error-message hidden">Passwords do not match</div>
+                </div>
+                <div class="mb-4">
+                    <input type="tel" id="mobile" placeholder="Mobile Number" class="w-full p-2 border rounded" required>
+                    <div id="mobileError" class="error-message hidden">Valid mobile number required</div>
+                </div>
+                <div class="mb-4">
+                    <select id="hostelBlock" class="w-full p-2 border rounded" required>
+                        <option value="">Select Hostel Block</option>
+                        <option value="A">Block A</option>
+                        <option value="B">Block B</option>
+                        <option value="C">Block C</option>
+                        <option value="D">Block D</option>
+                    </select>
+                    <div id="hostelBlockError" class="error-message hidden">Please select hostel block</div>
+                </div>
+                <div class="mb-4">
+                    <input type="text" id="roomNumber" placeholder="Room Number" class="w-full p-2 border rounded" required>
+                    <div id="roomNumberError" class="error-message hidden">Room number is required</div>
+                </div>
+                <button id="registerBtn" class="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700">Register</button>
+                <div id="registerServerError" class="error-message mt-2 hidden"></div>
+                <div id="registrationSuccess" class="text-green-600 mt-2 hidden">Registration successful! You can now login.</div>
+                <p class="text-center mt-4">Already registered? <a href="#" id="showLogin" class="text-indigo-600 hover:underline">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="hidden p-4">
+        <nav class="bg-white shadow-md p-4 rounded-lg mb-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl font-bold">Welcome to Campus Hub<span id="welcomeName"></span></h1>
+                <button id="logoutBtn" class="text-indigo-600 hover:text-indigo-800">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </nav>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <div class="text-center">
+                    <i class="fas fa-tshirt text-4xl mb-3 text-indigo-600"></i>
+                    <h3 class="text-lg font-semibold mb-2">Laundry Manager</h3>
+                    <p class="text-gray-600 mb-4">Book slots and check machine status</p>
+                    <button id="laundryBtn" class="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700">Open</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <div class="text-center">
+                    <i class="fas fa-utensils text-4xl mb-3 text-green-600"></i>
+                    <h3 class="text-lg font-semibold mb-2">Mess Food Optimizer</h3>
+                    <p class="text-gray-600 mb-4">View menu and submit preferences</p>
+                    <button id="messBtn" class="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700">Open</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <div class="text-center">
+                    <i class="fas fa-search text-4xl mb-3 text-yellow-600"></i>
+                    <h3 class="text-lg font-semibold mb-2">Lost &amp; Found</h3>
+                    <p class="text-gray-600 mb-4">Report lost or found items</p>
+                    <button id="lostFoundBtn" class="w-full bg-yellow-600 text-white p-2 rounded hover:bg-yellow-700">Open</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <div class="text-center">
+                    <i class="fas fa-bullhorn text-4xl mb-3 text-red-600"></i>
+                    <h3 class="text-lg font-semibold mb-2">Notices &amp; Issues</h3>
+                    <p class="text-gray-600 mb-4">View notices and report issues</p>
+                    <button id="noticesBtn" class="w-full bg-red-600 text-white p-2 rounded hover:bg-red-700">Open</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Laundry modal -->
+    <div id="laundryModal" class="modal hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-md w-96">
+            <h2 class="text-xl font-bold mb-4">Laundry Manager</h2>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Book a Slot (1 hour):</h3>
+                <select id="machineSelection" class="w-full p-2 border rounded mb-2"></select>
+                <input type="datetime-local" id="laundryTime" class="w-full p-2 border rounded">
+                <div id="bookedSlots" class="text-sm text-gray-600 mt-2"></div>
+            </div>
+            <div class="mb-4">
+                <h3 class="font-semibold">Current Status:</h3>
+                <div id="machineStatus" class="mt-2"></div>
+            </div>
+            <div class="mb-4">
+                <h3 class="font-semibold">Your Upcoming Bookings:</h3>
+                <ul id="myBookings" class="mt-2 text-sm"></ul>
+            </div>
+            <button id="bookLaundryBtn" class="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700">Book Slot</button>
+            <div id="laundryMsg" class="mt-2 text-sm"></div>
+            <button id="closeLaundryModal" class="w-full bg-gray-300 text-gray-800 p-2 rounded hover:bg-gray-400 mt-2">Close</button>
+        </div>
+    </div>
+
+    <!-- Mess modal -->
+    <div id="messModal" class="modal hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-md w-96">
+            <h2 class="text-xl font-bold mb-4">Mess Food Optimizer</h2>
+            <h3 class="font-semibold">Today's Menu:</h3>
+            <ul id="menuList" class="list-disc pl-5 mb-4"></ul>
+            <div class="mb-4">
+                <h3 class="font-semibold">Meal Preference:</h3>
+                <select id="mealOption" class="w-full p-2 border rounded">
+                    <option value="full">Full</option>
+                    <option value="half">Half</option>
+                    <option value="skip">Skip</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <h3 class="font-semibold">Feedback:</h3>
+                <textarea id="mealFeedback" class="w-full p-2 border rounded" placeholder="Your feedback..."></textarea>
+            </div>
+            <button id="submitMealBtn" class="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700">Submit</button>
+            <div id="messMsg" class="mt-2 text-sm"></div>
+            <button id="closeMessModal" class="w-full bg-gray-300 text-gray-800 p-2 rounded hover:bg-gray-400 mt-2">Close</button>
+        </div>
+    </div>
+
+    <!-- Lost & Found modal -->
+    <div id="lostFoundModal" class="modal hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-md w-96">
+            <h2 class="text-xl font-bold mb-4">Lost &amp; Found</h2>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Lost Item</h3>
+                <input type="text" id="lostItemDesc" placeholder="Description" class="w-full p-2 border rounded mb-2">
+                <input type="text" id="lostLocation" placeholder="Location lost" class="w-full p-2 border rounded mb-2">
+                <input type="file" id="lostImage" class="w-full" accept="image/*">
+            </div>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Found Item</h3>
+                <input type="text" id="foundItemDesc" placeholder="Description" class="w-full p-2 border rounded mb-2">
+                <input type="text" id="foundLocation" placeholder="Location found" class="w-full p-2 border rounded mb-2">
+                <input type="file" id="foundImage" class="w-full" accept="image/*">
+            </div>
+            <button id="submitLostFoundBtn" class="w-full bg-yellow-600 text-white p-2 rounded hover:bg-yellow-700">Submit</button>
+            <div id="lostFoundMsg" class="mt-2 text-sm"></div>
+            <h3 class="font-semibold mt-4 mb-1">Recent reports</h3>
+            <ul id="lostFoundList" class="text-sm space-y-1"></ul>
+            <button id="closeLostFoundModal" class="w-full bg-gray-300 text-gray-800 p-2 rounded hover:bg-gray-400 mt-2">Close</button>
+        </div>
+    </div>
+
+    <!-- Notices modal -->
+    <div id="noticesModal" class="modal hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-md w-96">
+            <h2 class="text-xl font-bold mb-4">Notices &amp; Issues</h2>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Upcoming Notices:</h3>
+                <ul id="noticeList" class="list-disc pl-5 space-y-2"></ul>
+            </div>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">Report Issue:</h3>
+                <select id="issueType" class="w-full p-2 border rounded mb-2">
+                    <option value="cleaning">Cleaning Staff</option>
+                    <option value="technician">Technician</option>
+                </select>
+                <textarea id="issueDesc" class="w-full p-2 border rounded" placeholder="Describe the issue..."></textarea>
+            </div>
+            <button id="submitIssueBtn" class="w-full bg-red-600 text-white p-2 rounded hover:bg-red-700">Submit Issue</button>
+            <div id="issueMsg" class="mt-2 text-sm"></div>
+            <button id="closeNoticesModal" class="w-full bg-gray-300 text-gray-800 p-2 rounded hover:bg-gray-400 mt-2">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const $ = (id) => document.getElementById(id);
+        const loginPage = $('loginPage');
+        const dashboard = $('dashboard');
+
+        // ---------- API helper ----------
+        let token = null;
+        try { token = localStorage.getItem('token'); } catch {}
+
+        async function api(path, { method = 'GET', body, form } = {}) {
+            const headers = {};
+            if (token) headers.Authorization = 'Bearer ' + token;
+            let payload;
+            if (form) payload = form;
+            else if (body) { headers['Content-Type'] = 'application/json'; payload = JSON.stringify(body); }
+            const res = await fetch('/api' + path, { method, headers, body: payload });
+            let data = {};
+            try { data = await res.json(); } catch {}
+            if (res.status === 401 && token && path !== '/login') { logout(); }
+            if (!res.ok) { const err = new Error(data.error || 'Request failed'); err.status = res.status; err.fields = data.fields; throw err; }
+            return data;
+        }
+
+        function say(id, text, ok) {
+            const el = $(id);
+            el.textContent = text;
+            el.className = 'mt-2 text-sm ' + (ok ? 'text-green-600' : 'text-red-600');
+        }
+
+        function showError(id, message) { const el = $(id); el.textContent = message; el.classList.remove('hidden'); }
+        function hideError(id) { $(id).classList.add('hidden'); }
+        function clearErrors() { document.querySelectorAll('.error-message').forEach((el) => el.classList.add('hidden')); }
+        function shake(id) { $(id).classList.add('shake'); setTimeout(() => $(id).classList.remove('shake'), 500); }
+        function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+        function clearForm(formId) {
+            $(formId).querySelectorAll('input, select').forEach((i) => { i.value = ''; });
+            clearErrors();
+        }
+
+        // ---------- auth UI ----------
+        function showDashboard(user) {
+            $('welcomeName').textContent = user && user.name ? ', ' + user.name : '';
+            loginPage.classList.add('hidden');
+            dashboard.classList.remove('hidden');
+        }
+        function logout() {
+            token = null;
+            try { localStorage.removeItem('token'); } catch {}
+            dashboard.classList.add('hidden');
+            loginPage.classList.remove('hidden');
+            document.querySelectorAll('.modal').forEach((m) => m.classList.add('hidden'));
+            clearForm('loginForm');
+        }
+
+        $('showRegister').addEventListener('click', (e) => {
+            e.preventDefault();
+            $('loginForm').classList.add('hidden');
+            $('registerForm').classList.remove('hidden');
+            clearErrors();
+        });
+        $('showLogin').addEventListener('click', (e) => {
+            e.preventDefault();
+            $('registerForm').classList.add('hidden');
+            $('loginForm').classList.remove('hidden');
+            clearErrors();
+        });
+
+        $('loginBtn').addEventListener('click', async () => {
+            const email = $('email').value.trim();
+            const password = $('password').value;
+            let valid = true;
+            if (!validateEmail(email)) { showError('emailError', 'Please enter a valid email'); valid = false; } else hideError('emailError');
+            if (!password) { showError('passwordError', 'Password is required'); valid = false; } else hideError('passwordError');
+            if (!valid) return shake('loginForm');
+
+            try {
+                const data = await api('/login', { method: 'POST', body: { email, password } });
+                token = data.token;
+                try { localStorage.setItem('token', token); } catch {}
+                hideError('loginError');
+                $('password').value = '';
+                showDashboard(data.user);
+            } catch (err) {
+                showError('loginError', err.message);
+                shake('loginForm');
+            }
+        });
+
+        $('registerBtn').addEventListener('click', async () => {
+            const v = {
+                name: $('name').value.trim(),
+                institute: $('institute').value.trim(),
+                email: $('regEmail').value.trim(),
+                password: $('createPassword').value,
+                mobile: $('mobile').value.trim(),
+                hostelBlock: $('hostelBlock').value,
+                roomNumber: $('roomNumber').value.trim(),
+            };
+            const confirm = $('confirmPassword').value;
+            let valid = true;
+            const check = (cond, id, msg) => { if (!cond) { showError(id, msg); valid = false; } else hideError(id); };
+            check(v.name, 'nameError', 'Name is required');
+            check(v.institute, 'instituteError', 'Institute name is required');
+            check(validateEmail(v.email), 'regEmailError', 'Please enter a valid email');
+            check(v.password.length >= 6, 'createPasswordError', 'Password must be at least 6 characters');
+            check(v.password === confirm, 'confirmPasswordError', 'Passwords do not match');
+            check(/^\d{10}$/.test(v.mobile), 'mobileError', 'Enter a valid 10-digit mobile number');
+            check(v.hostelBlock, 'hostelBlockError', 'Please select hostel block');
+            check(v.roomNumber, 'roomNumberError', 'Room number is required');
+            hideError('registerServerError');
+            if (!valid) return shake('registerForm');
+
+            try {
+                await api('/register', { method: 'POST', body: v });
+                $('registrationSuccess').classList.remove('hidden');
+                setTimeout(() => {
+                    $('registerForm').classList.add('hidden');
+                    $('loginForm').classList.remove('hidden');
+                    $('email').value = v.email;
+                    $('registrationSuccess').classList.add('hidden');
+                    clearForm('registerForm');
+                }, 1500);
+            } catch (err) {
+                if (err.fields && err.fields.email) showError('regEmailError', err.fields.email);
+                else showError('registerServerError', err.message);
+                shake('registerForm');
+            }
+        });
+
+        $('logoutBtn').addEventListener('click', logout);
+
+        // ---------- modal plumbing ----------
+        function bindModal(openBtn, modalId, closeBtn, onOpen) {
+            $(openBtn).addEventListener('click', () => { $(modalId).classList.remove('hidden'); if (onOpen) onOpen(); });
+            $(closeBtn).addEventListener('click', () => $(modalId).classList.add('hidden'));
+        }
+        const fmt = (iso) => new Date(iso).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+
+        // ---------- laundry ----------
+        async function loadLaundry() {
+            try {
+                const [status, mine] = await Promise.all([api('/laundry/status'), api('/laundry/bookings')]);
+
+                const sel = $('machineSelection');
+                const prev = sel.value;
+                sel.innerHTML = '';
+                status.machines.forEach((m) => {
+                    const o = document.createElement('option');
+                    o.value = m.id; o.textContent = m.name;
+                    sel.appendChild(o);
+                });
+                if (prev) sel.value = prev;
+
+                const box = $('machineStatus');
+                box.innerHTML = '';
+                status.machines.forEach((m) => {
+                    const p = document.createElement('p');
+                    p.append(m.name + ': ');
+                    const s = document.createElement('span');
+                    s.className = m.inUse ? 'text-red-600' : 'text-green-600';
+                    s.textContent = m.inUse ? `In Use (${m.minutesRemaining} min remaining)` : 'Available';
+                    p.appendChild(s);
+                    box.appendChild(p);
+                });
+
+                const list = $('myBookings');
+                list.innerHTML = '';
+                if (!mine.bookings.length) list.innerHTML = '<li class="text-gray-500">None</li>';
+                mine.bookings.forEach((b) => {
+                    const li = document.createElement('li');
+                    li.className = 'flex justify-between items-center py-1';
+                    const span = document.createElement('span');
+                    span.textContent = `${b.machineName}: ${fmt(b.start)}`;
+                    const btn = document.createElement('button');
+                    btn.className = 'text-red-600 hover:underline';
+                    btn.textContent = 'Cancel';
+                    btn.addEventListener('click', async () => {
+                        try { await api('/laundry/bookings/' + b.id, { method: 'DELETE' }); say('laundryMsg', 'Booking cancelled', true); loadLaundry(); }
+                        catch (e) { say('laundryMsg', e.message, false); }
+                    });
+                    li.append(span, btn);
+                    list.appendChild(li);
+                });
+                loadBookedSlots();
+            } catch (e) { say('laundryMsg', e.message, false); }
+        }
+
+        async function loadBookedSlots() {
+            const id = $('machineSelection').value;
+            if (!id) return;
+            try {
+                const data = await api('/laundry/slots?machineId=' + encodeURIComponent(id));
+                const box = $('bookedSlots');
+                box.textContent = data.booked.length
+                    ? 'Already booked: ' + data.booked.map((s) => fmt(s.start) + ' to ' + new Date(s.end).toLocaleTimeString([], { timeStyle: 'short' })).join('; ')
+                    : 'No upcoming bookings on this machine.';
+            } catch {}
+        }
+        $('machineSelection').addEventListener('change', loadBookedSlots);
+
+        bindModal('laundryBtn', 'laundryModal', 'closeLaundryModal', () => { say('laundryMsg', '', true); loadLaundry(); });
+
+        $('bookLaundryBtn').addEventListener('click', async () => {
+            const machineId = Number($('machineSelection').value);
+            const time = $('laundryTime').value;
+            if (!time) return say('laundryMsg', 'Please select a date and time', false);
+            try {
+                const data = await api('/laundry/book', { method: 'POST', body: { machineId, start: new Date(time).toISOString() } });
+                say('laundryMsg', `Booking confirmed for Machine ${machineId} at ${fmt(data.booking.start)}`, true);
+            } catch (e) {
+                say('laundryMsg', e.message, false); // includes the double-booking rejection (409)
+            }
+            loadLaundry();
+        });
+
+        // ---------- mess ----------
+        bindModal('messBtn', 'messModal', 'closeMessModal', async () => {
+            say('messMsg', '', true);
+            try {
+                const data = await api('/mess/menu');
+                const ul = $('menuList');
+                ul.innerHTML = '';
+                data.menu.forEach((item) => { const li = document.createElement('li'); li.textContent = item; ul.appendChild(li); });
+                if (data.mine) { $('mealOption').value = data.mine.preference; $('mealFeedback').value = data.mine.feedback || ''; }
+            } catch (e) { say('messMsg', e.message, false); }
+        });
+        $('submitMealBtn').addEventListener('click', async () => {
+            const preference = $('mealOption').value;
+            try {
+                await api('/mess/preference', { method: 'POST', body: { preference, feedback: $('mealFeedback').value } });
+                say('messMsg', `Thank you! Your ${preference} meal selection has been recorded`, true);
+            } catch (e) { say('messMsg', e.message, false); }
+        });
+
+        // ---------- lost & found ----------
+        async function loadLostFound() {
+            try {
+                const data = await api('/lost-found');
+                const ul = $('lostFoundList');
+                ul.innerHTML = '';
+                if (!data.items.length) ul.innerHTML = '<li class="text-gray-500">No reports yet</li>';
+                data.items.slice(0, 5).forEach((i) => {
+                    const li = document.createElement('li');
+                    li.textContent = `[${i.kind.toUpperCase()}] ${i.description}` + (i.location ? ` (${i.location})` : '');
+                    ul.appendChild(li);
+                });
+            } catch {}
+        }
+        bindModal('lostFoundBtn', 'lostFoundModal', 'closeLostFoundModal', () => { say('lostFoundMsg', '', true); loadLostFound(); });
+
+        $('submitLostFoundBtn').addEventListener('click', async () => {
+            const reports = [
+                { kind: 'lost', desc: $('lostItemDesc'), loc: $('lostLocation'), img: $('lostImage') },
+                { kind: 'found', desc: $('foundItemDesc'), loc: $('foundLocation'), img: $('foundImage') },
+            ].filter((r) => r.desc.value.trim());
+            if (!reports.length) return say('lostFoundMsg', 'Please fill in at least one report', false);
+            try {
+                for (const r of reports) {
+                    const form = new FormData();
+                    form.append('kind', r.kind);
+                    form.append('description', r.desc.value.trim());
+                    form.append('location', r.loc.value.trim());
+                    if (r.img.files[0]) form.append('image', r.img.files[0]);
+                    await api('/lost-found', { method: 'POST', form });
+                    r.desc.value = ''; r.loc.value = ''; r.img.value = '';
+                }
+                say('lostFoundMsg', "Thank you for your report! We'll contact you if we find a match.", true);
+                loadLostFound();
+            } catch (e) { say('lostFoundMsg', e.message, false); }
+        });
+
+        // ---------- notices & issues ----------
+        bindModal('noticesBtn', 'noticesModal', 'closeNoticesModal', async () => {
+            say('issueMsg', '', true);
+            try {
+                const data = await api('/notices');
+                const ul = $('noticeList');
+                ul.innerHTML = '';
+                data.notices.forEach((n) => { const li = document.createElement('li'); li.textContent = n.title; ul.appendChild(li); });
+            } catch (e) { say('issueMsg', e.message, false); }
+        });
+        $('submitIssueBtn').addEventListener('click', async () => {
+            const type = $('issueType').value;
+            const description = $('issueDesc').value.trim();
+            if (!description) return say('issueMsg', 'Please describe the issue', false);
+            try {
+                await api('/issues', { method: 'POST', body: { type, description } });
+                $('issueDesc').value = '';
+                say('issueMsg', `Your ${type} request has been submitted. We'll address it soon!`, true);
+            } catch (e) { say('issueMsg', e.message, false); }
+        });
+
+        // ---------- resume session ----------
+        if (token) {
+            api('/me').then((d) => showDashboard(d.user)).catch(() => logout());
+        }
+    </script>
+</body>
+</html>
